@@ -594,19 +594,28 @@ if __name__ == '__main__':
         summary_for_plot = final_df.groupby(['AOP_Level', 'Method'])['ODCL_PEEP'].agg(['mean', 'std']).reset_index()
         summary_for_plot['error_top'] = summary_for_plot['mean'] + summary_for_plot['std']
         
+        # アスタリスクが収まるようにY軸上限を計算するための変数
+        max_y_limit = ax.get_ylim()[1]
+
         for aop in significant_aops:
             # アスタリスクをプロットするy座標を決定 (2つの手法のエラーバーの上端のうち、より高い方)
             y_pos_data = summary_for_plot[summary_for_plot['AOP_Level'] == aop]
             if not y_pos_data.empty:
                 y_pos = y_pos_data['error_top'].max()
-                ax.text(aop, y_pos + 0.3, '*', ha='center', va='bottom', color='red', fontsize=20, fontweight='bold')
-        # 右下に注釈を追加 (Bonferroni補正後)
-        ax.text(0.98, 0.02, '*: p < 0.05', transform=ax.transAxes, fontsize=12, ha='right', va='bottom')
+                ax.text(aop, y_pos + 0.5, '*', ha='center', va='bottom', color='red', fontsize=20, fontweight='bold')
+                # アスタリスクの高さ分（+1.5程度）余裕を持たせる
+                if (y_pos + 1.5) > max_y_limit:
+                    max_y_limit = y_pos + 1.5
+        
+        ax.set_ylim(top=max_y_limit)
+
+        # 右上に注釈を追加 (Bonferroni補正後) - 凡例の下に配置
+        ax.text(0.98, 0.80, '*: p < 0.05', transform=ax.transAxes, fontsize=12, ha='right', va='top')
 
     ax.set_title('Sensitivity Analysis: Impact of AOP on ODCL PEEP Calculation Methods', fontsize=18)
     ax.set_xlabel(r'Set $AOP_{regional}$ Mean (cmH$_2$O)', fontsize=14)
     ax.set_ylabel('Calculated ODCL PEEP (cmH$_2$O)', fontsize=14)
-    ax.legend(title='Calculation Method', fontsize=12)
+    ax.legend(title='Calculation Method', fontsize=12, loc='upper right')
     ax.grid(axis='y', linestyle='--', alpha=0.7)
     fig.tight_layout()
     plt.show()
