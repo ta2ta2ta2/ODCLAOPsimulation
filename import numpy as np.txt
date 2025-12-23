@@ -428,13 +428,12 @@ def create_unified_crossover_plot(params):
     
     ax1.tick_params(axis='y')
     ax1.invert_xaxis()
-    ax1.grid(True, linestyle='--', alpha=0.6)
+    ax1.grid(True, linestyle='--', alpha=0.6, linewidth=0.5)
     
     ax1.legend(loc='best')
     
-    fig.suptitle(fr'Unified ODCL & Compliance Plot ($AOP_{{regional}}$ Mean = {AOP_MEAN} cmH$_2$O)', fontsize=16)
-    
     fig.tight_layout()
+    plt.savefig(f'Representative_AOP_{AOP_MEAN}.pdf', format='pdf')
     plt.show()
 
 # --- メイン実行部 ---
@@ -517,10 +516,9 @@ if __name__ == '__main__':
             print(f"  {row['Method']:<25}: {row['mean']:.2f} ± {row['std']:.2f} cmH2O")
 
     print("\n" + "="*70 + "\n## 各AOPレベルの代表ケース詳細解析 ##\n" + "="*70)
-    for aop_val in AOP_LEVELS_TO_TEST:
-        representative_params = BASE_PARAMS.copy()
-        representative_params['aop_mean'] = aop_val
-        create_unified_crossover_plot(representative_params)
+    representative_params = BASE_PARAMS.copy()
+    representative_params['aop_mean'] = 12.0
+    create_unified_crossover_plot(representative_params)
 
     print("\n" + "="*70 + "\n## 統計的詳細分析 (ANOVA & 多重比較) ##\n" + "="*70)
     
@@ -612,10 +610,10 @@ if __name__ == '__main__':
         # 右上に注釈を追加 (Bonferroni補正後) - 凡例の下に配置
         ax.text(0.98, 0.80, '*: p < 0.05', transform=ax.transAxes, fontsize=12, ha='right', va='top')
 
-    ax.set_title('Sensitivity Analysis: Impact of AOP on ODCL PEEP Calculation Methods', fontsize=18)
     ax.set_xlabel(r'Set $AOP_{regional}$ Mean (cmH$_2$O)', fontsize=14)
     ax.set_ylabel('Calculated ODCL PEEP (cmH$_2$O)', fontsize=14)
     ax.legend(title='Calculation Method', fontsize=12, loc='upper right')
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    ax.grid(axis='y', linestyle='--', alpha=0.7, linewidth=0.5)
     fig.tight_layout()
+    plt.savefig('Sensitivity_Analysis.pdf', format='pdf')
     plt.show()
